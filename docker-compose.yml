@@ -1,46 +1,35 @@
-version: '3.8'
+version: '3.8'  # Specifies the version of the Docker Compose file format.
 
-services:
-  dind:
-    image: docker:20.10-dind
-    container_name: dind
-    privileged: true
+services:  # Defines the services that will be run.
+
+  dind:  # The Docker-in-Docker (DinD) service.
+    image: docker:20.10-dind  # Uses Docker-in-Docker image.
+    privileged: true  # Enables privileged mode for DinD to run Docker commands inside the container.
     networks:
       jenkins:
         aliases: 
-         - docker
+         - docker  # Alias for easy communication with Jenkins.
     environment:
-      DOCKER_TLS_CERTDIR: "/certs"
-    volumes:
-      - docker-certs-ca:/certs/ca
-      - docker-certs-client:/certs/client
-      - jenkins-data:/var/jenkins_home
+      DOCKER_TLS_CERTDIR: "/certs"  # Enables TLS and specifies the directory for certificates.
     ports:
-      - "2376:2376"
-   
-  jenkins:
-    image: jenkins/jenkins:lts-jdk11
-    container_name: jenkins
-    restart: unless-stopped
-    networks:
-      - jenkins
+      - "2376:2376"  # Exposes Docker API over TLS.
+
+  jenkins:  # The Jenkins service for CI/CD.
+    image: jenkins/jenkins:lts-jdk11  # Uses Jenkins LTS image with JDK 11.
     environment:
-      DOCKER_HOST: "tcp://docker:2376"
-      DOCKER_CERT_PATH: /certs/client
-      DOCKER_TLS_VERIFY: 1
+      DOCKER_HOST: "tcp://docker:2376"  # Connects Jenkins to the Docker service (DinD).
+      DOCKER_TLS_VERIFY: 1  # Verifies Docker communication using TLS.
     volumes:
-      - docker-certs-client:/certs/client:ro
-      - jenkins-data:/var/jenkins_home
-      - /usr/bin/docker:/usr/bin/docker
+      - /usr/bin/docker:/usr/bin/docker  # Allows Jenkins to run Docker commands.
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "8080:8080"  # Exposes Jenkins UI on port 8080.
+      - "50000:50000"  # Exposes Jenkins agent communication port.
 
 networks:
   jenkins:
-    driver: bridge
+    driver: bridge  # Creates a bridge network for isolated communication between services.
 
-volumes:
+volumes:  # Declares persistent volumes for data storage.
   jenkins-data:
   docker-certs-ca:
   docker-certs-client:
