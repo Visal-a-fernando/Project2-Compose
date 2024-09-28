@@ -25,5 +25,4 @@ This project demonstrates a complete CI/CD pipeline using **Jenkins**, **Docker*
 1. **Clone the Project**  
    Clone this repository to your local machine:
    ```bash
-   git clone <your-repo-url>
-   cd <project-directory>
+   git clone https://github.com/Visal-a-fernando/Project2-Compose.git
